@@ -4,6 +4,7 @@ using ClassSchedule.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ch12Ex1ClassSchedule.Migrations
 {
     [DbContext(typeof(ClassScheduleContext))]
-    partial class ClassScheduleContextModelSnapshot : ModelSnapshot
+    [Migration("20250306192652_restrictTeachers")]
+    partial class restrictTeachers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

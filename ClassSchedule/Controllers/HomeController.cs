@@ -27,6 +27,7 @@ namespace ClassSchedule.Controllers
             if (id == 0)
             {
                 classOptions.OrderBy = c => c.DayId;
+                classOptions.ThenOrderBy = c => c.MilitaryTime;
             }
             else
             {

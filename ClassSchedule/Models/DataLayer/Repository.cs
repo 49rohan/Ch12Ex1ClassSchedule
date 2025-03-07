@@ -8,11 +8,26 @@ namespace ClassSchedule.Models
     {
         protected ClassScheduleContext context { get; set; }
         private DbSet<T> dbset { get; set; }
+        public QueryOptions<T> Options { get; set; }
+
 
         public Repository(ClassScheduleContext ctx)
         {
             context = ctx;
             dbset = context.Set<T>();
+        }
+        public virtual T Get(QueryOptions<T> options)
+        {
+            IQueryable<T> query = dbset;
+            foreach (string include in options.GetIncludes())
+            {
+                query = query.Include(include);
+            }
+
+            if (options.HasWhere)
+                query = query.Where(options.Where);
+
+            return query.FirstOrDefault();
         }
 
         public virtual IEnumerable<T> List(QueryOptions<T> options)

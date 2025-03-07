@@ -6,15 +6,10 @@ namespace ClassSchedule.Controllers
 {
     public class ClassController : Controller
     {
-        private Repository<Class> classes { get; set; }
-        private Repository<Teacher> teachers { get; set; }
-        private Repository<Day> days { get; set; }
-
+        private readonly ClassScheduleUnitOfWork unitOfWork;
         public ClassController(ClassScheduleContext ctx)
         {
-            classes = new Repository<Class>(ctx);
-            teachers = new Repository<Teacher>(ctx);
-            days = new Repository<Day>(ctx);
+            unitOfWork = new ClassScheduleUnitOfWork(ctx);
         }
 
         public RedirectToActionResult Index() => RedirectToAction("Index", "Home");
@@ -37,15 +32,17 @@ namespace ClassSchedule.Controllers
         [HttpPost]
         public IActionResult Add(Class c)
         {
-            if (ModelState.IsValid) {
+            if (ModelState.IsValid)
+            {
                 if (c.ClassId == 0)
-                    classes.Insert(c);
+                    unitOfWork.Classes.Insert(c);
                 else
-                    classes.Update(c);
-                classes.Save();
+                    unitOfWork.Classes.Update(c);
+                unitOfWork.Save();
                 return RedirectToAction("Index", "Home");
             }
-            else {
+            else
+            {
                 string operation = (c.ClassId == 0) ? "Add" : "Edit";
                 this.LoadViewBag(operation);
                 return View();
@@ -62,29 +59,30 @@ namespace ClassSchedule.Controllers
         [HttpPost]
         public RedirectToActionResult Delete(Class c)
         {
-            classes.Delete(c);
-            classes.Save();
+            unitOfWork.Classes.Delete(c);
+            unitOfWork.Save();
             return RedirectToAction("Index", "Home");
         }
-
-        // private helper methods
         private Class GetClass(int id)
         {
-            var classOptions = new QueryOptions<Class> {
+            var classOptions = new QueryOptions<Class>
+            {
                 Includes = "Teacher, Day",
                 Where = c => c.ClassId == id
             };
-            var list = classes.List(classOptions);
+            var list = unitOfWork.Classes.List(classOptions);
 
-            // return first Class or blank Class if null
             return list.FirstOrDefault();
         }
+
         private void LoadViewBag(string operation)
         {
-            ViewBag.Days = days.List(new QueryOptions<Day> {
+            ViewBag.Days = unitOfWork.Days.List(new QueryOptions<Day>
+            {
                 OrderBy = d => d.DayId
             });
-            ViewBag.Teachers = teachers.List(new QueryOptions<Teacher> {
+            ViewBag.Teachers = unitOfWork.Teachers.List(new QueryOptions<Teacher>
+            {
                 OrderBy = t => t.LastName
             });
             ViewBag.Operation = operation;
